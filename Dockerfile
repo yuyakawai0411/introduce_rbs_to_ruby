@@ -7,5 +7,5 @@ RUN apt-get update && apt-get install -y \
     valgrind \
     strace
 
-COPY . /myapp
-
+WORKDIR /myapp
+COPY . .
