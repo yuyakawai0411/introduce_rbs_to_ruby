@@ -1,0 +1,9 @@
+version: "3.9"
+services:
+  myapp:
+    build: .
+    volumes:
+      - .:/myapp
+    # フォアグラウンドで動くプロセスがないため、立ち上げ直後に正常終了してしまう。コンテナを正常終了しないようにtty: trueを指定する。
+    # https://zenn.dev/hohner/articles/43a0da20181d34
+    tty: true
