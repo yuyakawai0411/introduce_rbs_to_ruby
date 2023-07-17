@@ -6,5 +6,4 @@ a = 100
 b = 200
 p a + b
 STR
-puts code
-pp Ripper.sexp(code)
+puts RubyVM::InstructionSequence.compile(code).disasm
