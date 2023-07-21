@@ -114,3 +114,7 @@ https://github.com/soutaro/steep
 ```
 $ bundle exec steep check
 ```
+
+## 参考図書
+
+[Ruby の仕組み](https://www.amazon.co.jp/Ruby%E3%81%AE%E3%81%97%E3%81%8F%E3%81%BF-Ruby-Under-Microscope-Shaughnessy/dp/4274050653)
