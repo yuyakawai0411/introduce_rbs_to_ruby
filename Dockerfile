@@ -9,3 +9,6 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /myapp
 COPY . .
+
+WORKDIR /myapp/ruby
+RUN bundle install
