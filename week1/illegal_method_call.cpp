@@ -13,6 +13,6 @@ public:
 int main()
 {
   Sample sample;
-  sample.printf();
+  sample.print();
   return 0;
 }
