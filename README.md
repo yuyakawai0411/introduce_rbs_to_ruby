@@ -1,1 +1,3 @@
-# introduce_rbs_to_ruby
+# 勉強会資料
+
+## [ruby に型を導入する意義](document/week1.md)
