@@ -1,8 +1,6 @@
-target :app do
-  check "lib"
+target :lib do
   signature "sig"
-
-  library "pathname"
+  check "lib"
 end
 
 # D = Steep::Diagnostic
