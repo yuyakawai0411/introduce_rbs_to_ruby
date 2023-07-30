@@ -1,13 +1,13 @@
 # 個人情報を扱うクラス
 class PersonalInformation
-  def initialize
-    @name = "山田太郎"
-    @birth_day = "1990/01/01"
+  def initialize(name:, birth_day:)
+    @name = name
+    @birth_day = birth_day
   end
 
   def self_introduction
-    "私の名前は#{@name}です。生年月日は#{@birth_day}です。"
+    "ぼく#{@name}です。生年月日は#{@birth_day}です。"
   end
 end
 
-puts PersonalInformation.new.self_introduction
+puts PersonalInformation.new(name: 'ドラえもん', birth_day: '2112-09-03').self_introduction
