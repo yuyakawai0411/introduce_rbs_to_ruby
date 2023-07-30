@@ -1,0 +1,3 @@
+class PersonalInformation
+  def self_introduction: () -> bool
+end
