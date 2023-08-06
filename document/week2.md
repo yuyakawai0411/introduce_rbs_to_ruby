@@ -2,119 +2,104 @@
 
 ## 目次
 
-1. 型が存在する意義
-   1. プログラムの表現力を上げるため
-   2. プログラムが正常に動くことを保証するため
-2. ruby に型を導入する意義
-   1. rbs
-   2. steep
+1. ruby が提供する型解析機能
+   1. 型システムの種類
+   2. 型の互換性を判断する手法
+   3. ライブラリ群
+2. rbs の型注釈
+   1. 型の付け方
+   2. 使用できる型
+   3.
 
-## 型が存在する意義
+## ruby が提供する型解析機能
 
-型が存在する意義は、プログラムの表現力を上げるため、プログラムが正常に動くことを保証するためと考えている。
+### 型システムの種類
 
-### プログラムの表現力を上げるため
+漸進的型付けに位置する。漸進的型付けとは、静的型付けや動的型付けの中間的存在で、typescript も漸進的型付けの一種である。<br>
+主に以下のような特徴を持つ。
 
-ソースコードを実行するには、PC が理解できる[バイナリーコード](https://ja.wikipedia.org/wiki/%E3%83%90%E3%82%A4%E3%83%8A%E3%83%AA)へ変換する必要がある。
-このバイナリに、現実世界で扱う複雑なデータ(文字、数値 etc)をマッピングするため、型を定義する。<br>
-そのため、コンパイラ言語、インタプリタ言語ともに型は定義されている。型は指定子(int, char etc)で、どのように変換するかとサイズの情報を持つ。
+- 型注釈(アノテーション)はプログラムの実行に影響を及ぼさない
+- コンパイル時に型検査を行う
+- 部分的に型検査を行う(型注釈があるもの、any 型でないものを型検査する)
 
-[![Image from Gyazo](https://i.gyazo.com/c6eb94c50b19897981437f25a01d95ce.png)](https://gyazo.com/c6eb94c50b19897981437f25a01d95ce)
+### 型の互換性を判断する手法
 
-図 1. ソースコードがバイナリコードに変換される手順(上:コンパイラ言語,下:インタプリタ言語 )
+構造的部分型と名前的部分型を使い分けている。typescript は構造的部分型を採用しているが、rbs ではクラスの継承関係に従い、名前的部分型で互換性を検証することが多い。
 
-#### 型を付与するタイミング
+#### 構造的部分型
 
-コンパイラ言語
+その型が持っているプロパティやメソッドが同じであれば互換性があると考える手法。そのため、ある型が別の型のサブタイプであるこを明示的に宣言する必要がない。
 
-- ソースコードから直接バイナリーコードに変換するため、ソースコードで型の指定が必要
+#### 名前的部分型
 
-インタプリタ言語
+その型の定義が同じであれば互換性があると考える手法。そのため、ある型が別の型のサブタイプであることを明示的に宣言しなければならない。
 
-- ソースコードからバイトコードに変換し、Virtual Machine が型を定義するため、ソースコードで型の指定が不要
+### ライブラリ群
 
-#### ruby ではどのような型が付与されているのか?
+型注釈は rbs、型推論は TypeProf、 型検査は steep が担う。
 
-ruby は、バイトコードを RubyVM のスタックに積み上げていくことで逐次実行している。RubyVM ではバイトコードを C 言語に変換し、実行している。その際に ruby で扱うデータ(オブジェクト)は、VALUE 型として定義されている。
+#### typescript が提供する型推論との違い
 
-- [RubyVM](https://docs.ruby-lang.org/ja/latest/class/RubyVM.html)
-- [VALUE 型](https://docs.ruby-lang.org/en/2.4.0/extension_ja_rdoc.html)
+TypeProf は ruby コードから型推論を行い、rbs ファイルを生成するライブラリである。そのため、typescript のような型推論の結果を型検査にしようするようなことはできない。
 
-https://qiita.com/south37/items/0eb05ebf31ba6cbf53c4
+## rbs の型注釈
 
-### プログラムが正常に動くことを保証するため
+### 型の付け方
 
-ソースコードを実行する前に、データ(オブジェクト)に対して不適合な型変換や不正な操作をしていないか検査する。<br>
-インタプリタ言語は、動的に型を生成することから、型検査がないものが多く、プログラムが正常に動くことを保証する機能がコンパイラ言語と比べて一部弱い。しかし、動的に型を生成することで、不整合な型変換等を考慮することなくコードが書けるメリットもある。
-
-```c++
-## 不適合な型変換でコンパイルエラー
-string A = "テスト";
-int B = A;
-cout << B << endl;
- => cannot convert 'std::__cxx11::string {aka std::__cxx11::basic_string<char>}' to 'int' in initialization
-
-* 型のサイズが違うだけだとコンパイルエラーにならない
-int A = 2147483647;
-short B = A;
-cout << B << endl;
- => -1
-
-## 不正な操作でコンパイルエラー
-class Sample
-{
-public:
-  void print()
-  {
-    printf("テスト");
-  }
-};
-
-int main()
-{
-  Sample sample;
-  sample.printf();
-  return 0;
-}
- => 'class Sample' has no member named 'printf'; did you mean 'print'?
-```
-
-図 2. コンパイラ言語の型検査
-
-#### ruby は型のサイズも動的に決まる
-
-ruby の integer は、[Fixnum クラスと Bignum クラス](https://scrapbox.io/rubytips/%E6%95%B0%E5%80%A4)で構成されている。
-Fixnum は 31 ビットまたは 63 ビットの固定長整数を扱うクラスですが、演算結果をこの範囲を超える場合、自動的に Bignum に拡張される。<br>
-https://scrapbox.io/rubytips/%E6%95%B0%E5%80%A4
-
-## ruby に型を導入する意義
-
-インタプリタ言語は、プログラムが正常に動くことを事前に保証する機能がコンパイラ言語と比べて一部弱い。rbs と steep で ruby に型を導入することで、インタプリタ言語のメリットを阻害せず、上記の欠点をカバーすることができる。
-
-### rbs
-
-ruby に型注釈を付与できる言語。<br>
-.rb に直接記入するのではなく、.rbs ファイルに記述する。そのため、ruby の機能を阻害するものではない。<br>
-https://github.com/ruby/rbs
+#### プロパティ
 
 ```ruby
-class User
-  attr_reader login: String
-  attr_reader email: String
+# 定数
+class PersonalInformation
+   GENDER: Array[String]
+end
 
-  def initialize: (login: String, email: String) -> void
+# インスタンス変数
+class PersonalInformation
+  @name: String
+  @age: Integer
 end
 ```
 
-### steep
+#### メソッド
 
-.rbs ファイルに対して、静的型検査を行う。<br>
-https://github.com/soutaro/steep
+`def メソッド名: (引数の型) -> 戻り値の型`で書く。その他以下のルールがある。
 
+- メソッドは、class や module の中でしか定義できない
+- クラスメソッドでは、`class << self`の記法は使えず、`self.`で定義する
+
+```ruby
+class Sample
+   # クラスメソッド
+   def self.foo: (Integer) -> String
+   # インスタンスメソッド
+   def foo: (Integer, Integer) -> String
+   # 可変長の引数を受け取るとき
+   def foo: (*Integer) -> String
+   # キーワード引数を受け取るとき
+   def foo: (n: Integer) -> String
+   # ブロックを受け取るとき
+   def foo: () { (Integer) -> void } -> String
+   # 引数がオプショナルな場合
+   def foo: (?Integer) -> String
+   def foo: (?n: Integer) -> String
+   def foo: () ?{ (Integer) -> void } -> String
+   # attr_*
+   attr_reader foo: Integer
+end
 ```
-$ bundle exec steep check
+
+### 提供されている型
+
+#### self
+
+```ruby
+class Sample
+   # Sampleのインスタンスが返る rubyのselfと同じ挙動
+  def foo: () -> self
+end
 ```
 
-## 参考図書
+####
 
-[Ruby の仕組み](https://www.amazon.co.jp/Ruby%E3%81%AE%E3%81%97%E3%81%8F%E3%81%BF-Ruby-Under-Microscope-Shaughnessy/dp/4274050653)
+### 型を自作する
