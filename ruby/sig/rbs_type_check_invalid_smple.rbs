@@ -1,0 +1,4 @@
+class PersonalInformation
+  def initialize: (name: String, birth_day: String) -> void
+  def self_introduction: () -> String
+end
