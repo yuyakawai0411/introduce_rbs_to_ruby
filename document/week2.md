@@ -11,9 +11,8 @@
    2. リテラル型
    3. 複合型
    4. レコード型
-3. rbs 型定義
-   1. type エイリアス
-   2. 型引数
+   5. ジェネリクス型
+3. まとめ
 
 ## ruby が提供する型解析機能
 
@@ -53,24 +52,53 @@ cry(dog);
 その型の定義が同じであれば互換性があると考える手法。そのため、ある型が別の型のサブタイプであることを明示的に宣言しなければならない。
 
 ```ruby
-# rbs
+# 型エラーになる例
+## rbs
 class Cat
-  attr_accessor name: String
+  attr_reader name: String
+
+  def initialize: (String) -> void
 end
 
 class Dog
-  attr_accessor name: String
+  attr_reader name: String
+
+  def initialize: (String) -> void
 end
 
 class Object
   def cry: (Cat) -> void
 end
 
-# ruby クラスやメソッドの定義は省略
+## ruby(クラスやメソッドの定義は省略)
 dog = Dog.new("Pochi")
 
 cry(dog)
 => Cannot pass a value of type `::Dog` as an argument of type `::Cat`
+
+# 型エラーにならない例
+## rbs
+class Animal
+  attr_reader name: String
+
+  def initialize: (String) -> void
+end
+
+class Cat < Animal
+end
+
+class Dog < Animal
+end
+
+class Object
+  def cry: (Animal) -> void
+end
+
+## ruby(クラスやメソッドの定義は省略)
+dog = Dog.new("Pochi")
+
+cry(dog)
+=> 型エラーにならない
 ```
 
 ### ライブラリ群
@@ -179,16 +207,36 @@ class Array[Elem]
   def first: () -> Elem
 end
 
-# 実際にはArrayのように、様々な型が入るデータ型はuncheckedとoutを組み合わせて定義されている
-# outは共変性のことで、typescriptのextendと同じ
+# ジェネリクス型に制限を与える。typescriptのextendsと同じ
+class Sample[Elem < Animal]
+  def cry: () -> Elem
+end
+
+# Arrayのように、様々な型が入るデータ型はuncheckedとoutを組み合わせて定義されている
 class Array[unchecked out Elem]
   def include?: (Elem) -> bool
 end
 https://github.com/ruby/rbs/blob/88b18802aa9e1cc2a2956104b4f3256a55f65577/core/array.rbs#L525
 ```
 
-#### 共変性
+#### 共変性(out)
 
-スーパータイプにサブタイプを代入するのは
+スーパータイプにサブタイプを代入するのを許可する(クラスの継承関係は関係なく代入を許可する)
 
-#### 反変性
+```ruby
+array_string = ["a", "b", "c"]
+# rubyコードとしては動くが、型チェックを通過することができない
+array_string << 11
+```
+
+#### 反変性(in)
+
+サブタイプにスーパータイプを代入するのを許可する。
+
+## まとめ
+
+- ruby が提供する型解析機能は、型注釈は rbs、型推論は TypeProf、 型検査は steep が担う。
+  - 型の互換性は、名前的部分型によりクラスの継承を明記することによって判断している
+  - 型推論の結果を型検査に適用することはできないため、TypeProf 等を使って自動で rbs ファイルを作成したり、外部ライブラリの rbs ファイルを別途インクルードする必要がある
+- typescript,rbs ともに同じような型を似たコードで記述することができるため、型注釈に対する学習コストは少なそう
+  - 共変性、反変性という typescript にはない型の概念が存在するが、ruby の柔軟性を維持するために定義されており、我々が普段書くコードではあまり使用しないと思われる

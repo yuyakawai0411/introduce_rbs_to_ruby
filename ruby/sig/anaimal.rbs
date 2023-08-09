@@ -1,11 +1,15 @@
-class Cat
-  attr_accessor name: String
+class Animal
+  attr_reader name: String
+
+  def initialize: (String) -> void
 end
 
-class Dog
-  attr_accessor name: String
+class Cat < Animal
+end
+
+class Dog < Animal
 end
 
 class Object
-  def cry: (Cat) -> void
+  def cry: (Animal) -> void
 end

@@ -1,4 +1,4 @@
-class Cat
+class Animal
   attr_reader :name
 
   def initialize(name)
@@ -6,12 +6,10 @@ class Cat
   end
 end
 
-class Dog
-  attr_reader :name
+class Cat < Animal
+end
 
-  def initialize(name)
-    @name = name
-  end
+class Dog < Animal
 end
 
 def cry(animal)
