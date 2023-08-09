@@ -6,10 +6,14 @@
    1. 型システムの種類
    2. 型の互換性を判断する手法
    3. ライブラリ群
-2. rbs の型注釈
-   1. 型の付け方
-   2. 使用できる型
-   3.
+2. rbs 型の種類
+   1. 基本型
+   2. リテラル型
+   3. 複合型
+   4. レコード型
+3. rbs 型定義
+   1. type エイリアス
+   2. 型引数
 
 ## ruby が提供する型解析機能
 
@@ -30,9 +34,44 @@
 
 その型が持っているプロパティやメソッドが同じであれば互換性があると考える手法。そのため、ある型が別の型のサブタイプであるこを明示的に宣言する必要がない。
 
+```typescript
+type Cat = { name: string };
+type Dog = { name: string };
+
+function cry(animal: Cat) {
+  console.log(`My name is... ${animal.name}!`);
+}
+
+const dog: Dog = { name: "Pochi" };
+
+cry(dog);
+=> 型エラーにならない
+```
+
 #### 名前的部分型
 
 その型の定義が同じであれば互換性があると考える手法。そのため、ある型が別の型のサブタイプであることを明示的に宣言しなければならない。
+
+```ruby
+# rbs
+class Cat
+  attr_accessor name: String
+end
+
+class Dog
+  attr_accessor name: String
+end
+
+class Object
+  def cry: (Cat) -> void
+end
+
+# ruby クラスやメソッドの定義は省略
+dog = Dog.new("Pochi")
+
+cry(dog)
+=> Cannot pass a value of type `::Dog` as an argument of type `::Cat`
+```
 
 ### ライブラリ群
 
@@ -40,66 +79,116 @@
 
 #### typescript が提供する型推論との違い
 
-TypeProf は ruby コードから型推論を行い、rbs ファイルを生成するライブラリである。そのため、typescript のような型推論の結果を型検査にしようするようなことはできない。
+TypeProf は ruby コードから型推論を行い、rbs ファイルを生成するライブラリである。そのため、typescript のように型推論の結果を型検査にしようするようなことはできない。
 
-## rbs の型注釈
+```typescript
+function give(){
+  return { value: 'string' };
+}
 
-### 型の付け方
+function receive(arg: number) {
+  console.log(arg.value);
+}
 
-#### プロパティ
+const reslut = give();
 
-```ruby
-# 定数
-class PersonalInformation
-   GENDER: Array[String]
-end
-
-# インスタンス変数
-class PersonalInformation
-  @name: String
-  @age: Integer
-end
+receive(reslut);
+=> 型 '{ value: string; }' の引数を型 'number' のパラメーターに割り当てることはできません。
 ```
 
-#### メソッド
+## rbs 型の種類
 
-`def メソッド名: (引数の型) -> 戻り値の型`で書く。その他以下のルールがある。
+### 基本型
 
-- メソッドは、class や module の中でしか定義できない
-- クラスメソッドでは、`class << self`の記法は使えず、`self.`で定義する
+instance 型は ruby の標準ライブラリや、自作のインスタンスをクラス名で参照でき、最もよく使うと思われる
 
 ```ruby
 class Sample
-   # クラスメソッド
-   def self.foo: (Integer) -> String
-   # インスタンスメソッド
-   def foo: (Integer, Integer) -> String
-   # 可変長の引数を受け取るとき
-   def foo: (*Integer) -> String
-   # キーワード引数を受け取るとき
-   def foo: (n: Integer) -> String
-   # ブロックを受け取るとき
-   def foo: () { (Integer) -> void } -> String
-   # 引数がオプショナルな場合
-   def foo: (?Integer) -> String
-   def foo: (?n: Integer) -> String
-   def foo: () ?{ (Integer) -> void } -> String
-   # attr_*
-   attr_reader foo: Integer
+   # instance型(ex. String, Integer)
+   def sample_instance() -> String
+   # nil型
+   def sample_nil() -> nil
+   # any型
+   def sample_untyped() -> untyped
+   # self型
+   def sample_self() -> self
+   # bool型
+   def sample_self() -> bool
+   # void型
+   def sample_void() -> void
 end
 ```
 
-### 提供されている型
+### リテラル型
 
-#### self
+特定の値だけを代入可能にする型
 
 ```ruby
 class Sample
-   # Sampleのインスタンスが返る rubyのselfと同じ挙動
-  def foo: () -> self
+  # 文字列のリテラル
+  def sample_string: () -> "x"
+
+  # シンボルのリテラル
+  def sample_symbol: () -> :x
+
+  # 数値のリテラル
+  def sample_integer: () -> 42
 end
 ```
 
-####
+### 複合型
 
-### 型を自作する
+複数の型を連結した型
+
+```ruby
+class Sample
+  # オプショナル
+  def sample_optional: () -> String?
+
+  # ユニオン型
+  def sample_union: () -> (String | Integer)
+
+  # インターセクション型
+  ## Dog,Catに定義されているメソッドを両方持った型
+  def sample_intersection: (Dog & Cat) -> void
+end
+```
+
+### レコード型
+
+キーバリューのデータを格納する型
+
+```ruby
+class Sample
+  def sample: () -> { x: String, y: Integer }
+
+  # ネストした場合
+  def sample_nest: () -> { x: { a: Integer, b: Integer } }
+
+  # keyが動的な場合は、instance型のHashを使う
+  def sample_hash: () -> Hash[Symbol, String]
+end
+```
+
+### ジェネリクス型
+
+型の安全性とコードの共通化を両立するため、型に引数を加えた型
+
+```ruby
+class Array[Elem]
+  def first: () -> Elem
+end
+
+# 実際にはArrayのように、様々な型が入るデータ型はuncheckedとoutを組み合わせて定義されている
+# outは共変性のことで、typescriptのextendと同じ
+class Array[unchecked out Elem]
+  def include?: (Elem) -> bool
+end
+https://github.com/ruby/rbs/blob/88b18802aa9e1cc2a2956104b4f3256a55f65577/core/array.rbs#L525
+```
+
+#### 共変性
+
+スーパータイプにサブタイプを代入するのは
+
+#### 反変性

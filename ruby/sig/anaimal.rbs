@@ -1,0 +1,11 @@
+class Cat
+  attr_accessor name: String
+end
+
+class Dog
+  attr_accessor name: String
+end
+
+class Object
+  def cry: (Cat) -> void
+end
