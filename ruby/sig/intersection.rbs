@@ -1,0 +1,8 @@
+type name = { name: String }
+type age = { age: Integer }
+
+class Object
+  def say_name: (name) -> void
+  def say_age: (age) -> void
+  def say_name_and_age: (name & age) -> void
+end

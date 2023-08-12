@@ -1,4 +1,4 @@
-# ruby に型を導入する意義
+# ruby が提供する型解析機能
 
 ## 目次
 
@@ -12,7 +12,8 @@
    3. 複合型
    4. レコード型
    5. ジェネリクス型
-3. まとめ
+3. 共変性・反変性
+4. まとめ
 
 ## ruby が提供する型解析機能
 
@@ -44,15 +45,15 @@ function cry(animal: Cat) {
 const dog: Dog = { name: "Pochi" };
 
 cry(dog);
-=> 型エラーにならない
+ => 型エラーにならない
 ```
 
 #### 名前的部分型
 
-その型の定義が同じであれば互換性があると考える手法。そのため、ある型が別の型のサブタイプであることを明示的に宣言しなければならない。
+その型の定義が同じであれば互換性があると考える手法。そのため、ある型が別の型のサブタイプであることを明示的に宣言しなければならない。<br>
+**ex1. サブタイプであることを宣言しない**
 
 ```ruby
-# 型エラーになる例
 ## rbs
 class Cat
   attr_reader name: String
@@ -72,11 +73,16 @@ end
 
 ## ruby(クラスやメソッドの定義は省略)
 dog = Dog.new("Pochi")
-
 cry(dog)
-=> Cannot pass a value of type `::Dog` as an argument of type `::Cat`
 
-# 型エラーにならない例
+## ターミナル
+$ steep check
+ => Cannot pass a value of type `::Dog` as an argument of type `::Cat`
+```
+
+**ex2. サブタイプであることをクラスの継承によって明示的に宣言**
+
+```ruby
 ## rbs
 class Animal
   attr_reader name: String
@@ -96,18 +102,39 @@ end
 
 ## ruby(クラスやメソッドの定義は省略)
 dog = Dog.new("Pochi")
-
 cry(dog)
-=> 型エラーにならない
+
+## ターミナル
+$ steep check
+ => 型エラーにならない
 ```
 
 ### ライブラリ群
 
-型注釈は rbs、型推論は TypeProf、 型検査は steep が担う。
+型注釈は rbs、型検査は steep、型推論は TypeProf が担う。<br>
 
-#### typescript が提供する型推論との違い
+#### steep 型検査を始める
 
-TypeProf は ruby コードから型推論を行い、rbs ファイルを生成するライブラリである。そのため、typescript のように型推論の結果を型検査にしようするようなことはできない。
+```terminal
+$ steep check
+```
+
+#### TypeProf で型推論を始める
+
+```
+$ typeprof -v lib/sample.rb
+ => 以下のようなrbsコードが出力される
+
+# Classes
+class Animal
+  attr_reader name: untyped
+  def initialize: (untyped name) -> void
+end
+```
+
+TypeProf は ruby コードから型推論を行い、rbs コードの生成を行うライブラリ。そのため、typescript のように型検査中に型推論を行うようなことはできない。
+
+**ex3. typescript では return の型をかかなくとも、型推論で型エラーになる**
 
 ```typescript
 function give(){
@@ -118,10 +145,10 @@ function receive(arg: number) {
   console.log(arg.value);
 }
 
-const reslut = give();
+const result = give();
 
-receive(reslut);
-=> 型 '{ value: string; }' の引数を型 'number' のパラメーターに割り当てることはできません。
+receive(result);
+ => 型 '{ value: string; }' の引数を型 'number' のパラメーターに割り当てることはできません。
 ```
 
 ## rbs 型の種類
@@ -173,11 +200,10 @@ class Sample
   # オプショナル
   def sample_optional: () -> String?
 
-  # ユニオン型
+  # ユニオン型(和集合)
   def sample_union: () -> (String | Integer)
 
-  # インターセクション型
-  ## Dog,Catに定義されているメソッドを両方持った型
+  # インターセクション型(積集合)
   def sample_intersection: (Dog & Cat) -> void
 end
 ```
@@ -211,7 +237,11 @@ end
 class Sample[Elem < Animal]
   def cry: () -> Elem
 end
+```
 
+## 共変性・反変性
+
+```ruby
 # Arrayのように、様々な型が入るデータ型はuncheckedとoutを組み合わせて定義されている
 class Array[unchecked out Elem]
   def include?: (Elem) -> bool
