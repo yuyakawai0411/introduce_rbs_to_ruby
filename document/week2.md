@@ -113,7 +113,7 @@ $ steep check
 
 型注釈は rbs、型検査は steep、型推論は TypeProf が担う。<br>
 
-#### steep 型検査を始める
+#### steep で型検査を始める
 
 ```terminal
 $ steep check
