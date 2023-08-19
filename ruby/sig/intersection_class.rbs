@@ -1,0 +1,25 @@
+class Object
+  private
+  def put_a: (Sample1) -> nil
+  def put_c: (Sample2) -> nil
+  # def put_a_and_c: (Sample1 & Sample2) -> nil
+end
+
+class Sample1
+  attr_reader a_attr: Integer
+  attr_reader b_attr: Integer
+  def initialize: (Integer, Integer) -> void
+end
+
+class Sample2
+  attr_reader b_attr: Integer
+  attr_reader c_attr: Integer
+  def initialize: (Integer, Integer) -> void
+end
+
+class Sample3
+  attr_reader a_attr: Integer
+  attr_reader b_attr: Integer
+  attr_reader c_attr: Integer
+  def initialize: (Integer, Integer, Integer) -> void
+end

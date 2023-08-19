@@ -2,20 +2,22 @@
 
 ## 目次
 
-1. ruby が提供する型解析機能
+1. 型解析機能
    1. 型システムの種類
    2. 型の互換性を判断する手法
    3. ライブラリ群
-2. rbs 型の種類
+2. 型の種類
    1. 基本型
    2. リテラル型
    3. 複合型
    4. レコード型
-   5. ジェネリクス型
-3. 共変性・反変性
+3. 型引数
+   1. 基本
+   2. 制約
+   3. 共変性・反変性
 4. まとめ
 
-## ruby が提供する型解析機能
+## 型解析機能
 
 ### 型システムの種類
 
@@ -151,7 +153,7 @@ receive(result);
  => 型 '{ value: string; }' の引数を型 'number' のパラメーターに割り当てることはできません。
 ```
 
-## rbs 型の種類
+## 型の種類
 
 ### 基本型
 
@@ -198,14 +200,20 @@ end
 ```ruby
 class Sample
   # オプショナル
-  def sample_optional: () -> String?
+  def sample_optional: (String?) -> void
 
   # ユニオン型(和集合)
-  def sample_union: () -> (String | Integer)
+  def sample_union: (String | Integer) -> void
 
-  # インターセクション型(積集合)
-  def sample_intersection: (Dog & Cat) -> void
+  # インターセクション型 => superclassはこれに該当するか?
+  def sample_intersection: (_Foo & _Bar) -> void
 end
+```
+
+**ex4. インターセクション型の使用例**
+
+```
+
 ```
 
 ### レコード型
@@ -224,22 +232,36 @@ class Sample
 end
 ```
 
-### ジェネリクス型
+#### レコード型の課題
 
-型の安全性とコードの共通化を両立するため、型に引数を加えた型
+[steep で Hash(Symbol, String)として扱われてしまい、レコード型の型検査が上手くできない？](https://github.com/yuyakawai0411/introduce_rbs_to_ruby/issues/10)
+
+## 型引数
+
+### 基本
+
+型の安全性とコードの共通化を両立するため、具体的な型を指定せず、引数で型を指定する方法
 
 ```ruby
 class Array[Elem]
   def first: () -> Elem
 end
+```
 
-# ジェネリクス型に制限を与える。typescriptのextendsと同じ
+### 制約
+
+ジェネリクス型に制約を与える。typescript の extends と同じ
+
+```ruby
+# Animalクラスのサブタイプでなければならない
 class Sample[Elem < Animal]
   def cry: () -> Elem
 end
 ```
 
-## 共変性・反変性
+#### ジェネリクス型の<記号の意味
+
+### 共変性・反変性
 
 ```ruby
 # Arrayのように、様々な型が入るデータ型はuncheckedとoutを組み合わせて定義されている

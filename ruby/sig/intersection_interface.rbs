@@ -1,0 +1,35 @@
+interface _Foo
+  def foo: () -> String
+end
+
+interface _Bar
+  def bar: () -> String
+end
+
+module FooModule
+  def foo: -> String
+end
+
+module BarModule
+  def bar: -> String
+end
+
+class Foo
+  include _Foo
+end
+
+class Bar
+  include _Bar
+end
+
+class FooBar
+  include _Foo
+  include _Bar
+end
+
+class Object
+  def put_foo: (_Foo) -> void
+  def put_bar: (_Bar) -> void
+  def put_foo_bar: (_Foo & _Bar) -> void
+  def put_foo_or_bar: (_Foo | _Bar) -> void
+end
