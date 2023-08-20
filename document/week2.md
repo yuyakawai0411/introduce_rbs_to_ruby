@@ -30,7 +30,7 @@
 
 ### 型の互換性を判断する手法
 
-構造的部分型と名前的部分型を使い分けている。typescript は構造的部分型を採用しているが、rbs ではクラスの継承関係に従い、名前的部分型で互換性を検証することが多い。
+構造的部分型と名前的部分型を使い分けている。typescript は構造的部分型を採用しているが、rbs は型をクラス名で指定した時は名前的部分型、それ以外は構造的部分型を採用している。
 
 #### 構造的部分型
 
@@ -108,7 +108,7 @@ cry(dog)
 
 ## ターミナル
 $ steep check
- => 型エラーにならない
+ => No type error detected.
 ```
 
 ### ライブラリ群
@@ -205,15 +205,80 @@ class Sample
   # ユニオン型(和集合)
   def sample_union: (String | Integer) -> void
 
-  # インターセクション型 => superclassはこれに該当するか?
+  # インターセクション型(積集合)
   def sample_intersection: (_Foo & _Bar) -> void
 end
 ```
 
 **ex4. インターセクション型の使用例**
 
-```
+対象のオブジェクトが、指定したメソッドを全て持っているかを確認する。<br>
+[インターセクション型はなぜ積集合という命名なのか？](https://qiita.com/ist-ko-su/items/af8224f7571817fbb9bd)
 
+```ruby
+## rbs
+interface _Foo
+  def foo: () -> String
+end
+
+interface _Bar
+  def bar: () -> String
+end
+
+class Foo
+  include _Foo
+end
+
+class BarInheritsFromFoo < Foo
+  include _Bar
+end
+
+class FooBar
+  include _Foo
+  include _Bar
+end
+
+class Object
+  def put_foo_bar: (_Foo & _Bar) -> void
+end
+
+## ruby
+module FooModule
+  def foo
+    "foo"
+  end
+end
+
+module BarModule
+  def bar
+    "bar"
+  end
+end
+
+class Foo
+  include FooModule
+end
+
+class BarInheritsFromFoo < Foo
+  include BarModule
+end
+
+class FooBar
+  include FooModule
+  include BarModule
+end
+
+def put_foo_bar(object)
+  puts object.foo
+  puts object.bar
+end
+
+put_foo_bar(Foo.new)
+ => Cannot pass a value of type `::Foo` as an argument of type `(::_Foo & ::_Bar)`
+put_foo_bar(BarInheritsFromFoo.new)
+ => No type error detected.
+put_foo_bar(FooBar.new)
+ => No type error detected.
 ```
 
 ### レコード型
@@ -250,16 +315,14 @@ end
 
 ### 制約
 
-ジェネリクス型に制約を与える。typescript の extends と同じ
+型引数に制約を与える。typescript の extends と同じ
 
 ```ruby
-# Animalクラスのサブタイプでなければならない
+# Animalクラスもしくはそのサブタイプでなければならない
 class Sample[Elem < Animal]
   def cry: () -> Elem
 end
 ```
-
-#### ジェネリクス型の<記号の意味
 
 ### 共変性・反変性
 
