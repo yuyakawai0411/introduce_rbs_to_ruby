@@ -1,11 +1,3 @@
-module FooModule
-  def foo: -> String
-end
-
-module BarModule
-  def bar: -> String
-end
-
 interface _Foo
   def foo: () -> String
 end

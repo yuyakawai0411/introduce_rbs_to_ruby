@@ -123,6 +123,8 @@ $ steep check
 
 #### TypeProf で型推論を始める
 
+TypeProf は ruby コードから型推論を行い、rbs コードの生成を行うライブラリ。そのため、typescript のように型検査中に型推論を行うようなことはできない。
+
 ```
 $ typeprof -v lib/sample.rb
  => 以下のようなrbsコードが出力される
@@ -133,8 +135,6 @@ class Animal
   def initialize: (untyped name) -> void
 end
 ```
-
-TypeProf は ruby コードから型推論を行い、rbs コードの生成を行うライブラリ。そのため、typescript のように型検査中に型推論を行うようなことはできない。
 
 **ex3. typescript では return の型をかかなくとも、型推論で型エラーになる**
 
@@ -243,29 +243,26 @@ class Object
 end
 
 ## ruby
-module FooModule
+class Foo
   def foo
     "foo"
   end
 end
 
-module BarModule
+class BarInheritsFromFoo < Foo
   def bar
     "bar"
   end
 end
 
-class Foo
-  include FooModule
-end
-
-class BarInheritsFromFoo < Foo
-  include BarModule
-end
-
 class FooBar
-  include FooModule
-  include BarModule
+  def foo
+    "foo"
+  end
+
+  def bar
+    "bar"
+  end
 end
 
 def put_foo_bar(object)
@@ -273,6 +270,7 @@ def put_foo_bar(object)
   puts object.bar
 end
 
+## ターミナル
 put_foo_bar(Foo.new)
  => Cannot pass a value of type `::Foo` as an argument of type `(::_Foo & ::_Bar)`
 put_foo_bar(BarInheritsFromFoo.new)
@@ -283,7 +281,8 @@ put_foo_bar(FooBar.new)
 
 ### レコード型
 
-キーバリューのデータを格納する型
+キーバリューのデータを格納する型<br>
+[steep で Hash(Symbol, String)として扱われてしまい、レコード型の型検査が上手くできない？](https://github.com/yuyakawai0411/introduce_rbs_to_ruby/issues/10)
 
 ```ruby
 class Sample
@@ -296,10 +295,6 @@ class Sample
   def sample_hash: () -> Hash[Symbol, String]
 end
 ```
-
-#### レコード型の課題
-
-[steep で Hash(Symbol, String)として扱われてしまい、レコード型の型検査が上手くできない？](https://github.com/yuyakawai0411/introduce_rbs_to_ruby/issues/10)
 
 ## 型引数
 
@@ -326,23 +321,24 @@ end
 
 ### 共変性・反変性
 
+共変性・反変性のルールを適用することができる。ruby では型の健全性よりもプロググラムの柔軟性を優先するため、untyped を使用してこれらのるルールを無視することがある。<br>
+[共変性・反変性とは?](<https://ja.wikipedia.org/wiki/%E5%85%B1%E5%A4%89%E6%80%A7%E3%81%A8%E5%8F%8D%E5%A4%89%E6%80%A7_(%E8%A8%88%E7%AE%97%E6%A9%9F%E7%A7%91%E5%AD%A6)>)
+
 ```ruby
-# Arrayのように、様々な型が入るデータ型はuncheckedとoutを組み合わせて定義されている
+## rbs
 class Array[unchecked out Elem]
   def include?: (Elem) -> bool
 end
-https://github.com/ruby/rbs/blob/88b18802aa9e1cc2a2956104b4f3256a55f65577/core/array.rbs#L525
+
+## ターミナル
+array_string = ["a", "b", "c"]
+# rubyコードとしては動くが、型チェックを通過することができない
+array_string << 11
 ```
 
 #### 共変性(out)
 
 スーパータイプにサブタイプを代入するのを許可する(クラスの継承関係は関係なく代入を許可する)
-
-```ruby
-array_string = ["a", "b", "c"]
-# rubyコードとしては動くが、型チェックを通過することができない
-array_string << 11
-```
 
 #### 反変性(in)
 
@@ -354,4 +350,3 @@ array_string << 11
   - 型の互換性は、名前的部分型によりクラスの継承を明記することによって判断している
   - 型推論の結果を型検査に適用することはできないため、TypeProf 等を使って自動で rbs ファイルを作成したり、外部ライブラリの rbs ファイルを別途インクルードする必要がある
 - typescript,rbs ともに同じような型を似たコードで記述することができるため、型注釈に対する学習コストは少なそう
-  - 共変性、反変性という typescript にはない型の概念が存在するが、ruby の柔軟性を維持するために定義されており、我々が普段書くコードではあまり使用しないと思われる
