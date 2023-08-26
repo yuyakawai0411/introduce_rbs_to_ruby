@@ -1,26 +1,23 @@
-module FooModule
+class Foo
   def foo
     "foo"
   end
 end
 
-module BarModule
+class BarInheritsFromFoo < Foo
   def bar
     "bar"
   end
 end
 
-class Foo
-  include FooModule
-end
-
-class BarInheritsFromFoo < Foo
-  include BarModule
-end
-
 class FooBar
-  include FooModule
-  include BarModule
+  def foo
+    "foo"
+  end
+
+  def bar
+    "bar"
+  end
 end
 
 def put_foo_bar(object)
