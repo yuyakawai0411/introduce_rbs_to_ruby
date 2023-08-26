@@ -1,4 +1,43 @@
-## rbs 型注釈
+# rbs で型注釈を書く
+
+## 目次
+
+1. 型定義
+   1. class / module
+   2. interface
+   3. type
+2. 型注釈
+   1. プロパティ
+   2. 関数
+
+## 型定義
+
+### class / module
+
+### interface
+
+### type
+
+```
+type エイリアス
+type result = String | Symbol
+
+class Sample
+def sample: () -> result
+end
+
+# 名前空間を使う時
+
+module Response
+type result = String | Symbol
+end
+
+class Sample
+def sample: () -> Response::result
+end
+```
+
+## 型注釈
 
 ### プロパティ
 
@@ -43,20 +82,3 @@ class Sample
    attr_reader foo: Integer
 end
 ```
-
-type エイリアス
-type result = String | Symbol
-
-class Sample
-def sample: () -> result
-end
-
-# 名前空間を使う時
-
-module Response
-type result = String | Symbol
-end
-
-class Sample
-def sample: () -> Response::result
-end
