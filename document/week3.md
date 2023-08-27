@@ -2,44 +2,77 @@
 
 ## 目次
 
-1. 型定義
-   1. class / module
-   2. interface
-   3. type
-2. 型注釈
-   1. プロパティ
-   2. 関数
+1. Declarations
+   1. class
+   2. module
+   3. interface
+   4. type
+2. Members
+   1. property
+   2. method
 
-## 型定義
+## Declarations
 
-### class / module
+### class
+
+class を定義し、命名的部分型で型チェックを行うようにすることができる。`<`を使うことで継承関係を明示することができる。<br>
+
+```ruby
+## class実装例(継承を含む)
+
+
+```
+
+### module
+
+module を定義することができる。`:`を使うことで mixin 先の型を限定することができる。<br>
+
+```ruby
+## moduleがclassを継承している例
+
+## moduleが別のmoduleを継承している例
+
+## moduleがinterfaceを継承している例
+```
 
 ### interface
 
+関数型を名前をつけて定義することができる。class や module で参照する場合は、include or extend して宣言した関数型を呼び出すことができる。ジェネリクスを使うことができる
+
+```ruby
+## interfaceで定義する例
+
+## interfaceを呼び出す時の例
+
+## ジェネリクスを使える例
+
+```
+
+#### module と interface どちらを使うのか？
+
+```ruby
+## moduleとinterfaceの違いを表す例
+```
+
 ### type
 
-```
-type エイリアス
+型に別名をつけることができる。名前を指定してそのまま class や module で参照することができる。ジェネリクスを使うことができる
+
+```ruby
+## typeで定義する例
 type result = String | Symbol
-
+## typeを呼び出す時の例
 class Sample
-def sample: () -> result
+   def sample: () -> result
 end
-
-# 名前空間を使う時
-
-module Response
-type result = String | Symbol
-end
-
-class Sample
-def sample: () -> Response::result
-end
+## ジェネリクスを使える例
 ```
 
-## 型注釈
+## Members
 
 ### プロパティ
+
+定数やインスタンス変数などに型情報を付与することができる
 
 ```ruby
 # 定数
@@ -56,29 +89,45 @@ end
 
 ### メソッド
 
-`def メソッド名: (引数の型) -> 戻り値の型`で書く。その他以下のルールがある。
-
-- メソッドは、class や module の中でしか定義できない
-- クラスメソッドでは、`class << self`の記法は使えず、`self.`で定義する
+クラスメソッドやインスタンスメソッドは以下のように定義することができる。private も定義することができる。
 
 ```ruby
 class Sample
-   # クラスメソッド
-   def self.foo: (Integer) -> String
-   # インスタンスメソッド
-   # 引数名を記述した方がわかりやすそう
-   def foo: (Integer, Integer) -> String
-   # 可変長の引数を受け取るとき
-   def foo: (*Integer) -> String
-   # キーワード引数を受け取るとき
-   def foo: (n: Integer) -> String
-   # ブロックを受け取るとき
-   def foo: () { (Integer) -> void } -> String
-   # 引数がオプショナルな場合
-   def foo: (?Integer) -> String
-   def foo: (?n: Integer) -> String
-   def foo: () ?{ (Integer) -> void } -> String
-   # attr_*
-   attr_reader foo: Integer
+   # インスタンスメソッドとクラスメソッドを定義する例
+   ## クラスメソッドでは、`class << self`の記法は使えず、`self.`で定義する
+
+   # privateも定義できる例, privateを呼び出そうとしてエラーになる例
 end
 ```
+
+#### ダックタイピング
+
+```ruby
+# ダックタイピングを許容している例, moduleやinterfaceを使用する
+
+```
+
+#### 動的メソッド
+
+@dynamic を使って、メソッドがあることを明示的にしめすことができる
+
+```ruby
+## attr_readerを許容している例
+
+## define_methodを許容している例
+
+## aliasを許容している例
+```
+
+#### オーバーロード
+
+同じクラス内で同じメソッドを定義することができる
+
+```ruby
+## オーバーロードの例
+```
+
+## 余力があれば
+
+- raise を表記する例
+- 共変性・反変性の例

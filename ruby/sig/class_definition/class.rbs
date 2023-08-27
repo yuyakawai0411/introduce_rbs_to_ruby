@@ -1,0 +1,18 @@
+class Animal
+  attr_reader name: String
+
+  def initialize: (String) -> void
+end
+
+class Dog < Animal
+end
+
+class Cat
+  attr_reader name: String
+
+  def initialize: (String) -> void
+end
+
+class Object
+  def cry: (Animal) -> void
+end

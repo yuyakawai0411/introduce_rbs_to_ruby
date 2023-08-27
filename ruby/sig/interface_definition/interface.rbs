@@ -1,0 +1,7 @@
+interface _Hoge
+  def hoge: () -> void
+end
+
+class Hoge
+  include _Hoge
+end

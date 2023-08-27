@@ -1,0 +1,17 @@
+module Cry : Animal
+  def cry: () -> void
+end
+
+class Animal
+end
+
+class Human
+end
+
+class Dog < Animal
+  include Cry # OK
+end
+
+class Boy < Human
+  include Cry # Animalの要素がないため、型エラーになる
+end

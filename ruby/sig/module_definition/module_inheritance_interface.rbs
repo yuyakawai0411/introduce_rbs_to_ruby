@@ -1,0 +1,11 @@
+interface _Qux
+  def qux_method: () -> void
+end
+
+module Quux : _Qux
+  def quux_method: () -> void
+end
+
+class SampleClass
+  include Quux  # Quxが足りていないため、型エラーになる
+end
