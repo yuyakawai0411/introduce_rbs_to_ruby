@@ -1,25 +1,12 @@
-class Animal
-  attr_reader :name
-
-  def initialize(name)
-    @name = name
-  end
+class Alphabet
 end
 
-class Dog < Animal
+class A < Alphabet
 end
 
-class Cat
-  attr_reader :name
-
-  def initialize(name)
-    @name = name
-  end
+def put_alphabet(alphabet)
+  puts "#{alphabet.class}"
 end
 
-def cry(animal)
-  puts "wan"
-end
-
-cat = Cat.new("Pochi")
-cry(cat)
+alphabet = A.new
+put_alphabet(alphabet)

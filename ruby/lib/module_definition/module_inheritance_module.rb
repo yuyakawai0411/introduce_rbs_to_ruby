@@ -1,22 +1,15 @@
-module Bar
-  def bar_method
-    puts "bar"
-  end
-end
-
-module Baz
-  def baz_method
-    puts "baz"
-  end
-end
-
 module Foo
-  def foo_method
+  def foo
     puts "foo"
   end
 end
 
-class SomeClass
+module Bar
+  def bar
+    puts "bar"
+  end
+end
+
+class FooBar
   include Bar
-  include Foo  # Bazが足りていないため、型エラーになる
 end

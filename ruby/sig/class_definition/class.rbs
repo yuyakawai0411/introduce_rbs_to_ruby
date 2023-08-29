@@ -1,18 +1,9 @@
-class Animal
-  attr_reader name: String
-
-  def initialize: (String) -> void
+class Alphabet
 end
 
-class Dog < Animal
-end
-
-class Cat
-  attr_reader name: String
-
-  def initialize: (String) -> void
+class A < Alphabet
 end
 
 class Object
-  def cry: (Animal) -> void
+  def put_alphabet: (Alphabet) -> void
 end

@@ -1,7 +1,20 @@
-interface _Hoge
-  def hoge: () -> void
+interface _Foo
+  def foo: () -> String
 end
 
-class Hoge
-  include _Hoge
+interface _Bar
+  def bar: () -> String
+end
+
+class Foo
+  include _Foo
+end
+
+class FooBar
+  include _Foo
+  include _Bar
+end
+
+class Object
+  def put_foo_bar: (_Foo & _Bar) -> void
 end

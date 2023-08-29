@@ -1,12 +1,12 @@
 D = Steep::Diagnostic
 
 target :lib do
-  signature "sig/module_definition"
-  # signature "sig/interface_definition"
+  # signature "sig/module_definition"
+  signature "sig/interface_definition"
   # signature "sig/class_definition"
 
-  check "lib/module_definition"
-  # check "lib/interface_definition"
+  # check "lib/module_definition"
+  check "lib/interface_definition"
   # check "lib/class_definition"
 
   # configure_code_diagnostics do |hash|

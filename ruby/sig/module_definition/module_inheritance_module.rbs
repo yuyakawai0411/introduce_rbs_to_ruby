@@ -1,16 +1,11 @@
-module Bar
-  def bar_method: () -> void
+module Foo
+  def foo: () -> void
 end
 
-module Baz
-  def baz_method: () -> void
+module Bar : Foo
+  def bar: () -> void
 end
 
-module Foo : Bar, Baz
-  def foo_method: () -> void
-end
-
-class SomeClass
+class FooBar
   include Bar
-  include Foo  # Bazが足りていないため、型エラーになる
 end

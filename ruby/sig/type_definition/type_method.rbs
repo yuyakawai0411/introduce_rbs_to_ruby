@@ -1,0 +1,15 @@
+# type Increment = (num: Integer) -> Integer;
+
+# class Object
+#   def increment: Increment
+# end
+# 
+interface _Increment
+  def increment: (num: Integer) -> Integer
+end
+
+type Increment = _Increment
+
+# class Object
+#   def increment: Increment
+# end

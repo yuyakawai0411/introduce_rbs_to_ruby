@@ -1,19 +1,16 @@
-module Cry
-  def cry
-    puts "wan wan"
+module Put
+  def put_alphabet
+    puts "alphabet"
   end
 end
 
-class Animal
+class Alphabet
 end
 
-class Human
+class A < Alphabet
+  include Put
 end
 
-class Dog < Animal
-  include Foo
-end
-
-class Boy < Human
-  include Foo
+class Sample
+  include Put
 end

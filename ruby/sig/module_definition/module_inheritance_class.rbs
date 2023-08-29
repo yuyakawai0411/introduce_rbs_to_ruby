@@ -1,17 +1,14 @@
-module Cry : Animal
-  def cry: () -> void
+module Put : Alphabet
+  def put_alphabet: () -> void
 end
 
-class Animal
+class Alphabet
 end
 
-class Human
+class A < Alphabet
+  include Put
 end
 
-class Dog < Animal
-  include Cry # OK
-end
-
-class Boy < Human
-  include Cry # Animalの要素がないため、型エラーになる
+class Sample
+  include Put
 end
