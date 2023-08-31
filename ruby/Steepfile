@@ -2,16 +2,18 @@ D = Steep::Diagnostic
 
 target :lib do
   # signature "sig/module_definition"
-  signature "sig/interface_definition"
+  # signature "sig/interface_definition"
   # signature "sig/class_definition"
+  signature "sig/dynamic"
 
   # check "lib/module_definition"
-  check "lib/interface_definition"
+  # check "lib/interface_definition"
   # check "lib/class_definition"
+  check "lib/dynamic"
 
-  # configure_code_diagnostics do |hash|
-  #   hash[D::Ruby::MethodDefinitionMissing] = :warning
-  # end
+  configure_code_diagnostics do |hash|
+    hash[D::Ruby::MethodDefinitionMissing] = :warning
+  end
 end
 
 # D = Steep::Diagnostic

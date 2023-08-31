@@ -1,0 +1,11 @@
+interface _SampleInterface
+  def dynamic_method: () -> String
+end
+
+class Sample
+end
+
+class Object
+  def put_dynamic_method: (_SampleInterface) -> void
+end
+

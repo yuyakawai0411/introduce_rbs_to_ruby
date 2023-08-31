@@ -1,0 +1,15 @@
+class Cat
+  attr_reader name: String
+
+  def initialize: (String) -> void
+end
+
+class Dog
+  attr_reader name: String
+
+  def initialize: (String) -> void
+end
+
+class Object
+  def put_name: (Dog | Cat) -> void
+end
