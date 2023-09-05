@@ -19,9 +19,8 @@ rbs 内で宣言できるものを Declarations という。
 
 ### class
 
-class は命名的部分型として扱われる。<br>
-継承関係は、`class クラス名 < スーパークラス名`で表すことができる。<br>
-ruby の class と同様に、class 内では変数,定数,mixin,メソッドの宣言をすることができる。<br>
+`class クラス名 < スーパークラス名`で宣言する。<br>
+型を class で指定した場合は、命名的部分型として扱われる。<br>
 
 ```ruby
 # rbs
@@ -55,9 +54,8 @@ put_alphabet(alphabet)
 
 ### module
 
-module は構造的部分型として扱われる。<br>
-module 内の self の型を制限(mixin 先を制限)は、 `module モジュール名 : クラス名, モジュール名, インターフェース名`で実現できる。<br>
-ruby の module と同様に、module 内では定数,mixin,メソッドの宣言をすることができる<br>
+`module モジュール名`で宣言する。<br>
+`module モジュール名 : クラス名, モジュール名, インターフェース名`とすることで、mixin を制限できる。<br>
 
 **ex1.クラス名を指定して、mixin を制限する**
 
@@ -75,7 +73,7 @@ class A < Alphabet
 end
 
 class Sample
-  include Put
+  include Put # Alphabetクラス以外にmixinしているためRBS::ModuleSelfTypeError
 end
 
 # ruby
@@ -113,7 +111,7 @@ module Bar : Foo
 end
 
 class FooBar
-  include Bar
+  include Bar # FooモジュールがmixinされていないためRBS::ModuleSelfTypeError
 end
 
 # ruby
@@ -139,11 +137,11 @@ end
 
 ### interface
 
-interface は構造的部分型として扱われる。<br>
-interface は`interface _インターフェース名`のようにインターフェース名にアンダーバーをつける必要がある。<br>
-interface では、mixin,メソッドだけ宣言することができる<br>
+`interface _インターフェース名`で宣言する(アンダーバー必須)。型を interface で指定した場合は、構造的部分型として扱われる。<br>
+interface では、mixin(interface のみ)とメソッドの宣言だけすることができる<br>
 
 ```ruby
+# rbs
 interface _Foo
   def foo: () -> String
 end
@@ -165,7 +163,7 @@ class Object
   def put_foo_bar: (_Foo & _Bar) -> void
 end
 
-## ruby
+# ruby
 module FooModule
   def foo
     "foo"
@@ -200,11 +198,11 @@ put_foo_bar(FooBar.new) # fooもbarメソッドも持っているためOK
 
 ### type
 
-型に別名をつけることができる。<br>
+`type タイプ名 = 型`で宣言する。<br>
 typescript のように関数型を type に格納することはできない。(メソッドの定義まで含めないと関数型として機能しない)<br>
 
 ```ruby
-### typescript
+# typescript
 type result = string | number;
 
 type Increment = (num: number) => number;
@@ -272,34 +270,89 @@ end
 
 ### method
 
-クラスメソッドやインスタンスメソッドは以下のように定義することができる。private も定義することができる。
+メソッドを宣言できる。<br>
+`def メソッド名: (引数の型) -> 戻り値の型`が基本的なメソッドの型定義のフォーマットになる<br>
+クラスメソッドの定義で使う、class << self の記法は使えない
 
 ```ruby
 class Sample
-   # インスタンスメソッドとクラスメソッドを定義する例
-   ## クラスメソッドでは、`class << self`の記法は使えず、`self.`で定義する
-
-   # privateも定義できる例, privateを呼び出そうとしてエラーになる例
+   # インスタンスメソッド
+   def foo: (Integer, Integer) -> String
+   # クラスメソッド
+   def self.foo: (Integer) -> String
+   # 可変長の引数を受け取るとき
+   def foo: (*Integer) -> String
+   # キーワード引数を受け取るとき
+   def foo: (n: Integer) -> String
+   # ブロックを受け取るとき
+   def foo: () { (Integer) -> void } -> String
+   # 引数がオプショナルな場合
+   def foo: (?Integer) -> String
+   def foo: (?n: Integer) -> String
+   def foo: () ?{ (Integer) -> void } -> String
 end
 ```
 
 #### ダックタイピング
 
+interface を使うことで構造的部分型で判断するようになり、ダックタイピングを実現することができる。
+
 ```ruby
-# ダックタイピングを許容している例, interfaceを使用する
+## rbs
+interface _Foo
+  def foo: () -> String
+end
+
+interface _Bar
+  def bar: () -> String
+end
+
+class Foo
+  include _Foo
+end
+
+class FooBar
+  include _Foo
+  include _Bar
+end
+
+class Object
+  def put_foo_bar: (_Foo & _Bar) -> void
+end
+
+## ruby(クラスやメソッドの定義は省略)
+put_foo_bar(Foo.new) # fooメソッドしか持っていないため型エラー
+put_foo_bar(FooBar.new) # foo, barメソッドを持っているためOK
+
+## ターミナル
+$ steep check
+ => Cannot pass a value of type `::Foo` as an argument of type `(::_Foo & ::_Bar)`
 
 ```
 
 #### 動的メソッド
 
-@dynamic を使って、メソッドがあることを明示的にしめすことができる
+Steep の @dynamic アノテーションを使うことで、型エラーを出さずに動的メソッドを RBS で宣言することができる。動的メソッド自体の型検査は行われないが、RBS に型を宣言したことで、他の型検査で活すことができる。
 
 ```ruby
-## attr_readerを許容している例
+## rbs
+class Sample
+  def dynamic_method: () -> Integer # 動的メソッドの型検査は行われないため、型エラーにならない
+end
 
-## define_methodを許容している例
+## ruby
+class Sample
+  # @dynamic dynamic_method
+  define_method :dynamic_method do
+    "dynamic_method"
+  end
+end
 
-## aliasを許容している例
+puts Sample.new.dynamic_method
+
+## ターミナル
+$ steep check
+ => No type error detected.
 ```
 
 #### オーバーロード
