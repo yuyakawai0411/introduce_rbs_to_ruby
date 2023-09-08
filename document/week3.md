@@ -20,7 +20,7 @@ rbs 内で宣言できるものを Declarations という。
 ### class
 
 `class クラス名 < スーパークラス名`で宣言する。<br>
-型を class で指定した場合は、命名的部分型として扱われる。<br>
+型を class で指定した場合は、公称型として扱われる。<br>
 
 ```ruby
 # rbs
@@ -137,7 +137,8 @@ end
 
 ### interface
 
-`interface _インターフェース名`で宣言する(アンダーバー必須)。型を interface で指定した場合は、構造的部分型として扱われる。<br>
+`interface _インターフェース名`で宣言する(アンダーバー必須)。<br>
+型を interface で指定した場合は、構造的部分型として扱われる。<br>
 interface では、mixin(interface のみ)とメソッドの宣言だけすることができる<br>
 
 ```ruby
@@ -250,8 +251,7 @@ end
 
 ### mixin
 
-mixin を宣言することができる。<br>
-interface では、interface しか mixin することができない<br>
+mixin を宣言することができる。(interface では、interface しか mixin することができない)<br>
 
 ```ruby
 # rbs
@@ -278,18 +278,21 @@ end
 class Sample
    # インスタンスメソッド
    def foo: (Integer, Integer) -> String
+   def foo: (?Integer) -> String # 引数がオプショナルな場合
+
    # クラスメソッド
    def self.foo: (Integer) -> String
+
    # 可変長の引数を受け取るとき
    def foo: (*Integer) -> String
+
    # キーワード引数を受け取るとき
    def foo: (n: Integer) -> String
+   def foo: (?n: Integer) -> String # 引数がオプショナルな場合
+
    # ブロックを受け取るとき
    def foo: () { (Integer) -> void } -> String
-   # 引数がオプショナルな場合
-   def foo: (?Integer) -> String
-   def foo: (?n: Integer) -> String
-   def foo: () ?{ (Integer) -> void } -> String
+   def foo: () ?{ (Integer) -> void } -> String # 引数がオプショナルな場合
 end
 ```
 
@@ -332,7 +335,9 @@ $ steep check
 
 #### 動的メソッド
 
-Steep の @dynamic アノテーションを使うことで、型エラーを出さずに動的メソッドを RBS で宣言することができる。動的メソッド自体の型検査は行われないが、RBS に型を宣言したことで、他の型検査で活すことができる。
+動的メソッド(define_method)に対しては型検査を行うことはできない。<br>
+@dynamic アノテーションを使うことで、動的メソッドが実装されていることを Steep に検知させることはできる。これにより`MethodDefinitionMissing`を回避することができる。<br>
+[attribute](https://github.com/ruby/rbs/blob/master/docs/syntax.md#attribute-definition)や[alias](https://github.com/ruby/rbs/blob/master/docs/syntax.md#alias)のようなよく使う動的メソッドは、専用の型注釈によって型検査を行うことができる
 
 ```ruby
 ## rbs
@@ -352,15 +357,7 @@ puts Sample.new.dynamic_method
 
 ## ターミナル
 $ steep check
- => No type error detected.
-```
-
-#### オーバーロード
-
-同じクラス内で同じメソッドを定義することができる
-
-```ruby
-## オーバーロードの例
+ => No type error detected. # 動的なメソッドが実装されていることをSteepが検知しているため、MethodDefinitionMissingにはならない
 ```
 
 ## まとめ
