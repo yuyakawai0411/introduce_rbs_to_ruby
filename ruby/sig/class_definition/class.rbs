@@ -1,0 +1,9 @@
+class Alphabet
+end
+
+class A < Alphabet
+end
+
+class Object
+  def put_alphabet: (Alphabet) -> void
+end

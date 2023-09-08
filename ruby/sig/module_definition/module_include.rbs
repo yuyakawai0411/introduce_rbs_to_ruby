@@ -1,0 +1,11 @@
+module Puts
+  def puts_wrapper: () -> nil
+end
+
+class SampleInclude
+  # include Puts
+end
+
+class Object
+  def puts_method: (SampleInclude sample) -> nil
+end

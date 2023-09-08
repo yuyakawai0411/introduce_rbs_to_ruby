@@ -1,0 +1,14 @@
+module Put : Alphabet
+  def put_alphabet: () -> void
+end
+
+class Alphabet
+end
+
+class A < Alphabet
+  include Put
+end
+
+class Sample
+  include Put
+end

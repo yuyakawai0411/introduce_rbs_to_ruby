@@ -1,0 +1,11 @@
+module Foo
+  def foo: () -> void
+end
+
+module Bar : Foo
+  def bar: () -> void
+end
+
+class FooBar
+  include Bar
+end
