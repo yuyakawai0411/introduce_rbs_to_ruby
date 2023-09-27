@@ -11,11 +11,12 @@
 1. 外部ライブラリの型情報を生成する
    1. 外部ライブラリの型情報をインストール
    2. rails の型情報を追加で生成する
-   3. 型検査を実行する
 2. 自作コードの型情報を生成する
    1. 自動生成
    2. 手動修正
-   3. 型検査を実行する
+3. 型検査を実行する
+   1. 型情報に構文エラーがないかチェックする
+   2. 型検査をする
 
 ## 外部ライブラリの型情報を生成する
 
@@ -195,42 +196,12 @@ end
 
 [参考文献](https://github.com/pocke/rbs_rails)
 
-### 型検査を実行する
-
-#### 1. Steepfile を編集する
-
-```ruby
-D = Steep::Diagnostic
-
-target :app do
-  signature "sig" # sig以下の指定で問題ないか？ ./gem_rbs_collection以下の型情報を読んでくれるか？
-
-  check "app" # appディレクトリを型検査の対象とする
-
-  configure_code_diagnostics do |hash|
-    hash[D::Ruby::UnknownConstant] = :information
-  end
-end
-```
-
-#### 2. 以下のコマンドを実行して、型検査をする。
-
-```terminal
-# steep gemが提供しているコマンド
-steep check
-```
-
-#### 型検査でエラーになる
-
-基本的に controller 系の型情報が提供されていなかったりするため、`$rails g scaffold todo title:string`したままの状態でも型エラーになります。(ActiveRecord 周りは型情報があるため型エラーにならない)<br>
-型情報を自分で追加したり、型検査の対象とするディレクトリを制限する必要があります。
-
 ## 自作コードの型情報を生成する
 
 ### 自動生成
 
 自動生成するコマンドは以下の 3 つがある。<br>
-動的解析では、実際にコードを動かして解析している。
+動的解析では、実際にコードを動かして解析している。(ただし、rbs prototype runtime と typeprof は動かし方のロジックが異なる)
 | コマンド | rbs prototype rb | rbs prototype runtime | typeprof |
 | --- |---|---|---|
 | 型解析 | 静的解析 | 動的解析 | 動的解析 |
@@ -293,10 +264,82 @@ class Todo
 end
 ```
 
+[参考文献](https://github.com/ruby/typeprof/blob/master/doc/doc.ja.md)
+
 ### 手動修正
 
 以下の勉強会でやったように、手動で型注釈を追加していく。<br>
 [rbs で型注釈を書く](document/week3.md)
+
+## 型検査を実行する
+
+### 型情報に構文エラーがないかチェックする
+
+#### 1. 以下のコマンドを実行して、構文エラーがないか確認する
+
+```terminal
+# rbs gemが提供しているコマンド
+rbs validate
+
+Validating class/module definition: `::ActiveModel::Name`...
+Validating class/module definition: `::ActiveModel::Naming`...
+Validating class/module definition: `::ActiveModel::Railtie`...
+Validating class/module definition: `::ActiveModel::SecurePassword`...
+Validating class/module definition: `::ActiveModel::SecurePassword::ClassMethods`...
+Validating class/module definition: `::ActiveModel::SecurePassword::InstanceMethodsOnActivation`...
+Validating class/module definition: `::ActiveModel::Serialization`...
+Validating class/module definition: `::ActiveModel::Serializers`...
+Validating class/module definition: `::ActiveModel::Serializers::JSON`...
+....
+```
+
+### 型検査をする
+
+#### 1. Steepfile を編集する
+
+```ruby
+D = Steep::Diagnostic
+
+target :app do
+  signature "sig" # 型ファイルの参照先(.gen_rbs_collectionは指定しなくても読み込んでくれるようになった。https://speakerdeck.com/pocke/the-newsletter-of-rbs-updates)
+
+  check "app" # 型検査の対象とする
+end
+```
+
+#### 2. 以下のコマンドを実行して、型検査をする。
+
+```terminal
+# steep gemが提供しているコマンド
+steep check
+```
+
+#### 型検査でエラーになる
+
+基本的に controller 系の型情報が提供されていなかったりするため、`$rails g scaffold todo title:string`したままの状態でも型エラーになります。(ActiveRecord 周りは型情報があるため型エラーにならない)<br>
+型情報を自分で追加したり、型検査の対象とするディレクトリを制限する必要があります。
+
+```terminal
+$ steep check
+
+app/controllers/application_controller.rb:1:6: [warning] Cannot find the declaration of class: `ApplicationController`
+│ Diagnostic ID: Ruby::UnknownConstant
+│
+└ class ApplicationController < ActionController::Base
+        ~~~~~~~~~~~~~~~~~~~~~
+
+app/controllers/todos_controller.rb:1:6: [warning] Cannot find the declaration of class: `TodosController`
+│ Diagnostic ID: Ruby::UnknownConstant
+│
+└ class TodosController < ApplicationController
+        ~~~~~~~~~~~~~~~
+
+app/controllers/todos_controller.rb:1:24: [warning] Cannot find the declaration of class: `ApplicationController`
+│ Diagnostic ID: Ruby::UnknownConstant
+│
+└ class TodosController < ApplicationController
+                          ~~~~~~~~~~~~~~~~~~~~~
+```
 
 ## まとめ
 
@@ -306,3 +349,5 @@ end
 - 自作コードの型情報を生成する
   - typeprof が型情報の自動生成に適していると思いました。
   - 自動生成は、全てのファイルを一度に生成するのではなく、必要なファイルのみ生成する方針がいいと思いました。(ライブラリの型情報に依存しているコードがあると型エラーになるため)
+- 外部ライブラリと自作コードの自動生成をしていると型情報か重複することがある。それを解消する rbs subtract というコマンドが新しく rbs gem で提供されることになった
+  - https://speakerdeck.com/pocke/lets-write-rbs?slide=8
