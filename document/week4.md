@@ -132,7 +132,7 @@ class Todo < ApplicationRecord
     done: 30,
   }, _prefix: true
 
-  # validatesは型情報が生成されなかった
+  # validatesは型情報が生成されなかった => /.gem_rbs_collectionの方で定義されていた
   validates :title, presence: true
   validates :status_type, presence: true
 
@@ -298,12 +298,16 @@ Validating class/module definition: `::ActiveModel::Serializers::JSON`...
 #### 1. Steepfile を編集する
 
 ```ruby
-D = Steep::Diagnostic
-
 target :app do
-  signature "sig" # 型ファイルの参照先(.gen_rbs_collectionは指定しなくても読み込んでくれるようになった。https://speakerdeck.com/pocke/the-newsletter-of-rbs-updates)
-
   check "app" # 型検査の対象とする
+
+  signature "sig" # 型ファイルの参照先
+  #.gen_rbs_collectionは指定しなくても読み込んでくれるようになった。それまでは以下のようにlibraryで使用する型を羅列しなければならなかった。(https://speakerdeck.com/pocke/the-newsletter-of-rbs-updates)
+  # library 'activesupport'
+  # library 'activejob'
+  # library 'activemodel'
+  # library 'actionview'
+  # library 'activerecord'
 end
 ```
 
