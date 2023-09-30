@@ -1,7 +1,9 @@
 # 勉強会資料
 
-## [ruby に型を導入する意義](document/week1.md)
+## [型を導入する意義](document/week1.md)
 
-## [ruby が提供する型システム](document/week2.md)
+## [RBS が提供する型システム](document/week2.md)
 
-## [rbs で型注釈を書く](document/week3.md)
+## [RBS で型注釈を書く](document/week3.md)
+
+## [アプリケーションに RBS を導入する](document/week4.md)
