@@ -66,7 +66,7 @@ gems:
 
 #### 外部ライブラリの型情報はどのようにしてインストールされているのか？
 
-Gemfile.lock に記載されている外部ライブラリを[gem_rbs_collection](https://github.com/ruby/gem_rbs_collection/tree/main/gems)リポジトリからインストールしている。<br>
+Gemfile.lock に記載されている外部ライブラリを見て[gem_rbs_collection](https://github.com/ruby/gem_rbs_collection/tree/main/gems)リポジトリ(TypeScript で言う DefinitelyTyped)から型情報をインストールしている。<br>
 上記のコマンドを実行した後は、`rbs_collection.lock.yaml`と.gem_rbs_collection ディレクトリ下に RBS ファイルが作成されている。
 
 ```yaml
@@ -348,7 +348,7 @@ app/controllers/todos_controller.rb:1:24: [warning] Cannot find the declaration 
 ## まとめ
 
 - 外部ライブラリの型情報を生成する
-  - 型情報が提供されているライブラリが少ないため、steep で型検証する範囲を狭めて、型情報を追加する度に、検証範囲を拡大する方針がいいと思いました。
+  - 型情報が提供されているライブラリが少ないため、steep で型検証する範囲を狭めて、型情報を追加する度に、検証範囲を拡大する方針がいいと思いました。(もしくは型情報がないところは untyped で型付けする)
   - 例:ライブラリを利用しない実装(amateras モデル,Form オブジェクトなど)→ActiveRecord→ その他
 - 自作コードの型情報を生成する
   - typeprof が型情報の自動生成に適していると思いました。
