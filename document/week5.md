@@ -45,7 +45,7 @@
 }
 ```
 
-**図 2. LSP の通信の例 [参考文献](https://learn.microsoft.com/ja-jp/visualstudio/extensibility/language-server-protocol?view=vs-2022)**
+**図 2. LSP の通信の例 [参考文献](https://learn.microsoft.com/ja-jp/visualstudio/extensibility/language-server-protocol?view=vs-2022)**<br>
 [![Image from Gyazo](https://i.gyazo.com/d3fcf2e41ab7a5104125104aba362f03.png)](https://gyazo.com/d3fcf2e41ab7a5104125104aba362f03)
 
 ### 警告を表示する
