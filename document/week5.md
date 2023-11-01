@@ -126,11 +126,11 @@ docker container 内で vscode server を立ち上げ、ローカルからその
 **図 3. Dev container の仕組み [参考文献](https://code.visualstudio.com/docs/devcontainers/containers)**
 [![Image from Gyazo](https://i.gyazo.com/ea71e87a29f9de9ace9811f566ad543b.png)](https://gyazo.com/ea71e87a29f9de9ace9811f566ad543b)
 
-**図 4. Dev container の動き**
+**図 4. Dev container の様子**
+[![Image from Gyazo](https://i.gyazo.com/1c967cc3b60a538f688e90654038d852.png)](https://gyazo.com/1c967cc3b60a538f688e90654038d852)
 
 #### 注意点
 
-- 接続後のデフォルトの path が、/root のため、特定の path に切り替えるにつようがある。
 - docker container 内の vscode server で拡張機能を再インストールする必要がある
   - => [devcontainer.json](https://containers.dev/implementors/json_reference/#lifecycle-scripts) でコンテナのライフサイクルに紐づけて path のマッピングや拡張機能のインストールすることができるらしいです
 - workspace で開くことができない
