@@ -130,9 +130,9 @@ docker container 内で vscode server を立ち上げ、ローカルからその
 
 #### 注意点
 
-- 接続後のデフォルトの path が、/root のため、/app に切り替えるにつようがある。
+- 接続後のデフォルトの path が、/root のため、特定の path に切り替えるにつようがある。
 - docker container 内の vscode server で拡張機能を再インストールする必要がある
-  - => [devcontainer.json](https://containers.dev/implementors/json_reference/#lifecycle-scripts) で拡張機能などのライブラリをコンテナのライフサイクルに紐づけてインストールすることができるらしいです
+  - => [devcontainer.json](https://containers.dev/implementors/json_reference/#lifecycle-scripts) でコンテナのライフサイクルに紐づけて path のマッピングや拡張機能のインストールすることができるらしいです
 - workspace で開くことができない
 
 ## LSP の種類
