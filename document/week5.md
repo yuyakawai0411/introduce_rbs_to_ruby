@@ -6,7 +6,8 @@
    1. 警告を表示する
    2. メソッド候補を表示する
    3. ホバーでヒントを表示する
-2. LSP の種類
+2. LSP を開発環境で動作させるためには
+3. LSP の種類
    1. vscode-steep
    2. vscode-typeprof
 
@@ -113,7 +114,30 @@ interface CompletionList {
 
 [textDocument/hover](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_hover)
 
+## LSP を開発環境で動作させるためには
+
+LSP ごとに指定の gem がインストールされている必要がある。Solargraph だと solargraph gem、vscode-steep だと steep gem のインストールが必要になる。
+
+### Dev container
+
+vscode の拡張機能。
+docker container 内で vscode server を立ち上げ、ローカルからそのサーバーに接続する。docker container 内で vscode を立ち上げている状態になるため、ローカルで gem のインストールが必要ない
+
+**図 3. Dev container の仕組み [参考文献](https://code.visualstudio.com/docs/devcontainers/containers)**
+[![Image from Gyazo](https://i.gyazo.com/ea71e87a29f9de9ace9811f566ad543b.png)](https://gyazo.com/ea71e87a29f9de9ace9811f566ad543b)
+
+**図 4. Dev container の動き**
+
+#### 注意点
+
+- 接続後のデフォルトの path が、/root のため、/app に切り替えるにつようがある。
+- docker container 内の vscode server で拡張機能を再インストールする必要がある
+  - => [devcontainer.json](https://containers.dev/implementors/json_reference/#lifecycle-scripts) で拡張機能などのライブラリをコンテナのライフサイクルに紐づけてインストールすることができるらしいです
+- workspace で開くことができない
+
 ## LSP の種類
+
+型情報を活用できる LSP は、vscode-steep と vscode-typeprof になるため、これらを紹介する。(型情報を活用できないが、有名な LSP Solargraph や RubyLSP がある)
 
 ### vscode-steep
 
