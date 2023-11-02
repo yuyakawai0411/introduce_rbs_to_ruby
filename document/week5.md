@@ -127,7 +127,6 @@ docker container 内で vscode server を立ち上げ、ローカルからその
 [![Image from Gyazo](https://i.gyazo.com/ea71e87a29f9de9ace9811f566ad543b.png)](https://gyazo.com/ea71e87a29f9de9ace9811f566ad543b)
 
 **図 4. Dev container の様子**
-[![Image from Gyazo](https://i.gyazo.com/1c967cc3b60a538f688e90654038d852.png)](https://gyazo.com/1c967cc3b60a538f688e90654038d852)
 
 #### 注意点
 
