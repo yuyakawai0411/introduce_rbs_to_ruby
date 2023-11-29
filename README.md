@@ -9,3 +9,5 @@
 ## [アプリケーションに RBS を導入する](document/week4.md)
 
 ## [LSP で開発体験を向上させる](document/week5.md)
+
+## [vscode-steep を使う](document/week6.md)
