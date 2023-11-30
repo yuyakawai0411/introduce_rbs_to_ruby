@@ -56,12 +56,12 @@ vscode-steep では、拡張機能がアクティブになった時に、[TypeCh
   - メソッドの候補を表示する(Request Message / Response Message)
   - ホバーで型情報を取得する(Request Message / Response Message)
 
-**図 1.エディタ上に静的型検査のエラーを作画する**
-[![Image from Gyazo](https://i.gyazo.com/572875077a3f4850553011075020a185.gif)](https://gyazo.com/572875077a3f4850553011075020a185)
-**図 2.メソッドの候補を表示する**
-[![Image from Gyazo](https://i.gyazo.com/bb2c39fe6506898913b6ed2ea0b75f82.gif)](https://gyazo.com/bb2c39fe6506898913b6ed2ea0b75f82)
-**図 3.ホバーで型情報を取得する**
-[![Image from Gyazo](https://i.gyazo.com/fe1e51f879db718a61408bdcfd5e652a.gif)](https://gyazo.com/fe1e51f879db718a61408bdcfd5e652a)
+**図 1.エディタ上に静的型検査のエラーを作画する**<br>
+[![Image from Gyazo](https://i.gyazo.com/572875077a3f4850553011075020a185.gif)](https://gyazo.com/572875077a3f4850553011075020a185)<br>
+**図 2.メソッドの候補を表示する**<br>
+[![Image from Gyazo](https://i.gyazo.com/bb2c39fe6506898913b6ed2ea0b75f82.gif)](https://gyazo.com/bb2c39fe6506898913b6ed2ea0b75f82)<br>
+**図 3.ホバーで型情報を取得する**<br>
+[![Image from Gyazo](https://i.gyazo.com/fe1e51f879db718a61408bdcfd5e652a.gif)](https://gyazo.com/fe1e51f879db718a61408bdcfd5e652a)<br>
 
 ## 言語サーバーとは？
 
@@ -96,7 +96,7 @@ def handle_job(job)
 ```
 
 **図 4.言語サーバーから送られてくるパラメータ**<br>
-vscode-steep に console.log を埋め込み、デバックモード動作を確認
+vscode-steep に console.log を埋め込み、デバックモード動作を確認<br>
 [![Image from Gyazo](https://i.gyazo.com/90160d16967eb490d7fa212b538ed536.png)](https://gyazo.com/90160d16967eb490d7fa212b538ed536)
 
 #### steep langserver にリクエストを送るには？
@@ -119,6 +119,20 @@ ruby    49776 kawaiyuya    2u   CHR               16,6  0t76279     2563 /dev/tt
 
 # LSPに準拠したlsp_request.jsonが作成できれば、エディタに返す標準出力のレスポンスが見れそう
 $ cat lsp_request.json | bundle exec steep langserver
+```
+
+#### stylelint の例
+
+vscode の拡張機能はローカルの`~/.vscode/extensions`に保存されている。例えば stylelint だと vscode を立ち上げた際に、[プロセス](https://code.visualstudio.com/api/advanced-topics/extension-host)が起動する
+
+```terminal
+$ cd ~/.vscode/extensions
+$ ls | grep stylelint.vscode-stylelint-1.3.0
+stylelint.vscode-stylelint-1.3.0
+
+# ローカルマシンで動いているデーモンも含めたプロセスを全て表示する
+$ ps aux | grep stylelint
+kawaiyuya        43523   0.0  0.1 1211024908  11988   ??  S    10:30PM   0:04.02 /Applications/Visual Studio Code.app/Contents/Frameworks/Code Helper (Plugin).app/Contents/MacOS/Code Helper (Plugin) --ms-enable-electron-run-as-node /Users/kawaiyuya/.vscode/extensions/stylelint.vscode-stylelint-1.3.0/dist/start-server.js --stdio --clientProcessId=43491
 ```
 
 ## 拡張機能はいつアクティブになるのか？
@@ -164,15 +178,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
 ## 言語サーバーとはどのタイミングで通信が開始するのか？
 
-コードで通信タイミングを追うのは難しいため、出力タブで通信が行われているかを確認するのが良い<br>
-
-- 静的型検査のエラーを表示するするのは
-  - ファイルを開いた時、前回と比べて差分があれば新しい情報を取得していると思われる
-- メソッドの候補の表示、ホバーで型情報を取得
-  - エディタでそのイベントを行ったタイミングで通信をしていると思われる
-
-**図 5.静的型検査のエラー**<br>
-[![Image from Gyazo](https://i.gyazo.com/14585f9632feec73a81d2d71ce6fa373.gif)](https://gyazo.com/14585f9632feec73a81d2d71ce6fa373)
+コードで通信タイミングを追うのは難しいため、出力タブで通信が行われているかを確認する<br>
 
 ```terminal
 # ファイルを開いた時のアクション
@@ -186,3 +192,22 @@ export async function activate(context: vscode.ExtensionContext) {
 [Steep 1.5.3] [interaction:interaction] [background] [#handle_job] [#process_hover] path=app/models/todo.rb, line=28, column=9
 [Steep 1.5.3] [interaction:interaction] [background] [#handle_job] [#process_hover] Generating hover response took 0.177024
 ```
+
+- 静的型検査のエラーを表示
+  - ファイルを開いた時、前回と比べて差分があれば通信をしていると思われる
+- メソッドの候補の表示、ホバーで型情報を取得
+  - エディタでそのイベントを行ったタイミングで通信をしていると思われる
+
+**図 5.静的型検査のエラー**<br>
+[![Image from Gyazo](https://i.gyazo.com/14585f9632feec73a81d2d71ce6fa373.gif)](https://gyazo.com/14585f9632feec73a81d2d71ce6fa373)
+
+## まとめ
+
+- vscode-steep には、以下の機能がある。静的型検査のエラー内容は Steep の実装に依存する
+  - 静的型検査のエラーを表示する
+  - メソッドの候補を表示する
+  - ホバーで型情報を取得する
+- LSP の機能が使えるのは、ローカルマシンのバックグラウンドプロセスで Steep の言語サーバーが立ち上がっているため
+- エディタと言語サーバーがやり取りするタイミングは以下のような時だと思われる
+  - 静的型検査のエラーを表示は、ファイルを開いた時、前回と比べて差分があれば通信をしている
+  - メソッドの候補の表示、ホバーで型情報を取得は、エディタでそのイベントを行ったタイミングで通信をしている
