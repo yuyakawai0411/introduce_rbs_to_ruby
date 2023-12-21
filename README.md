@@ -11,3 +11,5 @@
 ## [LSP で開発体験を向上させる](document/week5.md)
 
 ## [vscode-steep を使う](document/week6.md)
+
+## [振り返り](document/week7.md)
